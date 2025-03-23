@@ -5,6 +5,7 @@ import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.sql.SQLException;
+import java.util.List;
 
 public class ProdutosDAO {
     
@@ -41,7 +42,7 @@ public class ProdutosDAO {
                     stmt.setString(3, produto.getStatus());
 
                     // Executando a consulta
-                    stmt.executeUpdate();  // Usa executeUpdate() para comandos de inserção
+                    stmt.executeUpdate();  
 
                     // Exibindo a mensagem de sucesso
                     JOptionPane.showMessageDialog(null, "Produto cadastrado com sucesso!");
@@ -72,15 +73,71 @@ public class ProdutosDAO {
                     }
                 }
         }
-    
-    
-        public ArrayList<ProdutosDTO> listarProdutos(){
+            
+            
+        public ArrayList<ProdutosDTO> listarProdutos()
+        {
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            ArrayList<ProdutosDTO> lista = new ArrayList<>(); // Inicializando a lista
 
-            return listagem;
-        }
-    
-    
-    
-        
+            try
+            {
+                conn = new conectaDAO().connectDB();
+
+                if (conn == null)
+                {
+                    JOptionPane.showMessageDialog(null, "Erro: Conexão com o banco de dados falhou.");
+                    return lista; // Retornando lista vazia, pois a conexão falhou
+                }
+
+                // SQL para selecionar todos os produtos
+                String sql = "SELECT * FROM produtos";
+                stmt = conn.prepareStatement(sql); 
+
+                rs = stmt.executeQuery(); // Executando a consulta
+
+                // Preenchendo a lista com os dados do ResultSet
+                while (rs.next())
+                {
+                    ProdutosDTO pro = new ProdutosDTO();
+                    pro.setId(rs.getInt("id")); 
+                    pro.setNome(rs.getString("nome"));
+                    pro.setValor(rs.getInt("valor"));
+                    pro.setStatus(rs.getString("status"));
+
+                    lista.add(pro);
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("Erro ao pesquisar tabela Produtos: " + e.getMessage());
+            }
+            finally
+            {
+                try
+                {
+                    if (rs != null)
+                    {
+                        rs.close();
+                    }
+                    if (stmt != null)
+                    {
+                        stmt.close();
+                    }
+                    if (conn != null)
+                    {
+                        conn.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                    System.out.println("Erro ao fechar recursos: " + e.getMessage());
+                }
+            }
+
+            return lista; // Retornando a lista preenchida ou vazia
+    } 
 }
 
