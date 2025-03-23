@@ -211,11 +211,6 @@ public class ProdutosDAO {
                         System.out.println("Erro ao fechar recursos: " + e.getMessage());
                     }
                 }
-            }
-
-
-
-
-            
+            }  
 }
 
