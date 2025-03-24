@@ -212,5 +212,65 @@ public class ProdutosDAO {
                     }
                 }
             }  
+            
+            public ArrayList<ProdutosDTO> listarProdutosVendidos()
+            {
+                try
+                {
+                    conn = new conectaDAO().connectDB();
+
+                    if (conn == null)
+                    {
+                        JOptionPane.showMessageDialog(null, "Erro: Conexão com o banco de dados falhou.");
+                        return lista; // Retornando lista vazia, pois a conexão falhou
+                    }
+
+                    // SQL para selecionar todos os produtos
+                    String sql = "SELECT * FROM produtos WHERE status = 'Vendido'";
+                    stmt = conn.prepareStatement(sql); 
+
+                    rs = stmt.executeQuery(); // Executando a consulta
+
+                    // Preenchendo a lista com os dados do ResultSet
+                    while (rs.next())
+                    {
+                        ProdutosDTO pro = new ProdutosDTO();
+                        pro.setId(rs.getInt("id")); 
+                        pro.setNome(rs.getString("nome"));
+                        pro.setValor(rs.getInt("valor"));
+                        pro.setStatus(rs.getString("status"));
+
+                        lista.add(pro);
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.out.println("Erro ao perocurar tabela Produtos: " + e.getMessage());
+                }
+                finally
+                {
+                    try
+                    {
+                        if (rs != null)
+                        {
+                            rs.close();
+                        }
+                        if (stmt != null)
+                        {
+                            stmt.close();
+                        }
+                        if (conn != null)
+                        {
+                            conn.close();
+                        }
+                    }
+                    catch (SQLException e)
+                    {
+                        System.out.println("Erro ao fechar recursos: " + e.getMessage());
+                    }
+                }
+
+                return lista; // Retornando a lista preenchida ou vazia
+            }
 }
 
